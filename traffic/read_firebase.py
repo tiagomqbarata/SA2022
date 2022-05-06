@@ -23,13 +23,11 @@ def getByDate(date):
     date = date.strftime("%m-%d-%Y_%H:%M")
 
     date =  re.split(r"_|-|:", date)
-    print("date splited: ", date)
 
     while int(date[-1]) % 10 != 0:
         date[-1] = int(date[-1]) - 1
       
     date = f"{date[0]}-{date[1]}-{date[2]}_{date[3]}:{date[4]}"
-    print("new date: ", date)  
     ref = db.reference('traffic_tomtom_braga/')
     dados = ref.order_by_key().start_at(date).limit_to_first(10).get()
 
@@ -39,6 +37,18 @@ def getByDate(date):
         return dados
 
 def getByDate_AllDay(date):
+    date = date - timedelta(hours=1)
+    date = date.strftime("%m-%d-%Y")
+
+    ref = db.reference('traffic_tomtom_braga/')
+    dados = ref.order_by_key().start_at(date).limit_to_first(1440).get()
+
+    if dados == None:
+        return {}
+    else:
+        return dados
+
+def getByDate_AllWeek(date):
     date = date - timedelta(hours=1)
     date = date.strftime("%m-%d-%Y")
 
