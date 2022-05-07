@@ -81,7 +81,6 @@ def getByDate_AllWeek(date):
         return dados
 
 def load_data(date = datetime.now()):
-    __init__()
     dados = getByDate(date)
     datetime = []
     lat = []
@@ -109,7 +108,6 @@ def load_data(date = datetime.now()):
     return data
 
 def load_data_allDay(date = datetime.now(), citiesNotShow = set()):
-    __init__()
     dados = getByDate_AllDay(date)
 
     if len(dados) == 0:
@@ -139,7 +137,6 @@ def load_data_allDay(date = datetime.now(), citiesNotShow = set()):
     return data
 
 def load_data_week(date = datetime.now(), citiesNotShow = set()):
-    __init__()
     dados = {}
 
     for i in range(7):
@@ -210,14 +207,13 @@ def map(data, lat, lon, zoom):
         )
     )
 
-# TODO
 def filterdata(date_selected):
     return load_data(date_selected)
 
 def mpoint(lat, lon):
     return (np.average(lat), np.average(lon))
 
-
+__init__()
 
 st.title("Tráfego em Braga")
 
