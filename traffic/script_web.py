@@ -155,7 +155,7 @@ def load_data_week(date = datetime.now(), citiesNotShow = set()):
     df["time_record"] = df["date_time"].map(lambda x: date_timeToRecord_date(x))
     df.drop("date_time", axis=1, inplace=True)
     df.time_record = pd.to_datetime(df.time_record)
-    df["day_week"] = df.time_record.dt.day_name('pt')
+    df["day_week"] = df.time_record.dt.day_name(locale='pt')
 
     df.drop("time_record", axis=1, inplace=True)
 
