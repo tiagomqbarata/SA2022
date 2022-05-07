@@ -1,23 +1,75 @@
 from pyparsing import col, empty
-import read_firebase as db
 import streamlit as st
 import pandas as pd
 import numpy as np
 import altair as alt
 import pydeck as pdk
 import datetime as dt
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
-
-
-db.__init__()
-
+from tracemalloc import Snapshot
+import firebase_admin
+from firebase_admin import db
 
 # SETTING PAGE CONFIG TO WIDE MODE
 st.set_page_config(layout="wide")
 
+def __init__():
+    # Read info from realtimedatabase from firebase
+    url = 'https://traffic-braga-default-rtdb.europe-west1.firebasedatabase.app/'
+    db_name = '/traffic_tomtom_braga/'
+
+    try:
+        # connect to Firebase
+        cred_object = firebase_admin.credentials.Certificate('./traffic-braga-firebase-adminsdk-qyjgx-1aa359d54c.json')
+        default_app = firebase_admin.initialize_app(cred_object, {'databaseURL':url })
+    except:
+        print("Already connected")
+
+def getByDate(date):
+    date = date - timedelta(hours=1)
+    date = date.strftime("%m-%d-%Y_%H:%M")
+
+    date =  re.split(r"_|-|:", date)
+
+    while int(date[-1]) % 10 != 0:
+        date[-1] = int(date[-1]) - 1
+      
+    date = f"{date[0]}-{date[1]}-{date[2]}_{date[3]}:{date[4]}"
+    ref = db.reference('traffic_tomtom_braga/')
+    dados = ref.order_by_key().start_at(date).limit_to_first(10).get()
+
+    if dados == None:
+        return {}
+    else:
+        return dados
+
+def getByDate_AllDay(date):
+    date = date - timedelta(hours=1)
+    date = date.strftime("%m-%d-%Y")
+
+    ref = db.reference('traffic_tomtom_braga/')
+    dados = ref.order_by_key().start_at(date).limit_to_first(1440).get()
+
+    if dados == None:
+        return {}
+    else:
+        return dados
+
+def getByDate_AllWeek(date):
+    date = date - timedelta(hours=1)
+    date = date.strftime("%m-%d-%Y")
+
+    ref = db.reference('traffic_tomtom_braga/')
+    dados = ref.order_by_key().start_at(date).limit_to_first(1440).get()
+
+    if dados == None:
+        return {}
+    else:
+        return dados
+
 def load_data(date = datetime.now()):
-    dados = db.getByDate(date)
+    dados = getByDate(date)
     datetime = []
     lat = []
     lon = []
@@ -44,7 +96,7 @@ def load_data(date = datetime.now()):
     return data
 
 def load_data_allDay(date = datetime.now(), citiesNotShow = set()):
-    dados = db.getByDate_AllDay(date)
+    dados = getByDate_AllDay(date)
 
     if len(dados) == 0:
         return pd.DataFrame()
@@ -76,7 +128,7 @@ def load_data_week(date = datetime.now(), citiesNotShow = set()):
     dados = {}
 
     for i in range(7):
-        dados.update(db.getByDate_AllDay(date - dt.timedelta(days=i)))
+        dados.update(getByDate_AllDay(date - dt.timedelta(days=i)))
 
     if len(dados) == 0:
         return pd.DataFrame()
