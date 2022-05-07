@@ -1,4 +1,4 @@
-from pyparsing import empty
+from pyparsing import col, empty
 import read_firebase as db
 import streamlit as st
 import pandas as pd
@@ -95,13 +95,24 @@ def load_data_week(date = datetime.now(), citiesNotShow = set()):
 
     df.drop("time_record", axis=1, inplace=True)
 
+    diasDaSemana = {}
+
+    colunas = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado',  'Domingo']
+    colunas = colunas[int(date.strftime("%w")):] + colunas[:int(date.strftime("%w"))]
+
+    for i in range(0, len(colunas)):
+        diasDaSemana[colunas[i]] = str(i+1)
+        colunas[i] = str(i+1) + " - " + colunas[i]
+        
+
     dicionario = []
     for local in np.sort(df.local.unique()):
         df_local = df[df.local == local]
-        aux_df = pd.DataFrame(columns=['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado',  'Domingo'], index=["Transito"])
+        aux_df = pd.DataFrame(columns=colunas, index=["Transito"])
         for day in df.day_week.unique():
-            aux_df[day] = df_local[df.day_week == day].transito.mean()
+            aux_df[diasDaSemana[day] + ' - ' + day] = df_local[df.day_week == day].transito.mean()
         dicionario.append((local, aux_df.T))
+
 
     return dicionario
 
