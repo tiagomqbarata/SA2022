@@ -202,6 +202,8 @@ def filterdata(date_selected):
 def mpoint(lat, lon):
     return (np.average(lat), np.average(lon))
 
+__init__()
+
 st.title("Tráfego em Braga")
 
 st.header("Trânsito em tempo real", anchor="map")
