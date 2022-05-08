@@ -1,5 +1,4 @@
---upgrade pip
-firebase-admin==5.2.0
+firebase-admin
 pandas==1.4.2
 numpy==1.22.3
 pydeck==0.7.1
