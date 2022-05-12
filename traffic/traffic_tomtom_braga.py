@@ -4,6 +4,26 @@ import requests
 import firebase_admin
 from firebase_admin import db
 from datetime import datetime
+# Import standard python modules
+import time
+
+# import Adafruit Blinka
+import digitalio
+# import Adafruit IO REST client.
+from Adafruit_IO import Client, Feed, RequestError
+
+
+# Set to your Adafruit IO key.
+# Remember, your key is a secret,
+# so make sure not to publish it when you publish this code!
+ADAFRUIT_IO_KEY = "aio_Idsh23lTnefURk6rzAwxZuhSdBxU"
+
+# Set to your Adafruit IO username.
+# (go to https://accounts.adafruit.com to find your username)
+ADAFRUIT_IO_USERNAME = "tiagomqbarata"
+
+# Create an instance of the REST client.
+aio = Client(ADAFRUIT_IO_USERNAME, ADAFRUIT_IO_KEY)
 
 
 # Pontos de Braga de onde foi feita a recolha de informação sobre o trânsito 
@@ -33,6 +53,17 @@ locais_Braga = {
   "Hospital Privado de Braga": (41.5278372, -8.417844),
   "Real Taberna": (41.5593592, -8.4462021)
 }
+
+localsKey = {'Avenida da Liberdade' : 'traffic.avenidaliberdade',
+             'Bosh' : 'traffic.bosh',
+             'Braga Parque' : 'traffic.bragaparque',
+             'Centro comercial Minho Center' : 'traffic.minhocenter',
+             'Estação de Comboios' : 'traffic.estacao',
+             'Hospital Privado de Braga' : 'traffic.hospitalprivado',
+             'Meliá' : 'traffic.melia',
+             'Real Taberna' : 'traffic.realtaberna',
+             'Rotunda Santos da Cunha' : 'traffic.santosdacunha',
+             'Sé de Braga' : 'traffic.sedebraga'}
 
 
 # Enter the api key of tomtom here
@@ -90,6 +121,11 @@ for local, coordenadas in locais_Braga.items():
             
         }
     )
+
+    transito = ((1 - (int(currentSpeed) / int(freeFlowSpeed) + int(freeFlowTravelTime) / int(currentTravelTime))/2) * int(confidence)) * 100
+
+    aio.send_data(localsKey[local], str(transito))
+
     
 
 
