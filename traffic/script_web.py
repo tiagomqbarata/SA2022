@@ -35,7 +35,7 @@ def __init__():
     except:
         print("Already connected")
 
-def getByDate(date):
+def getByDate(date = datetime.now()):
     date = date - timedelta(hours=1)
     date = date.strftime("%m-%d-%Y_%H:%M")
 
@@ -166,13 +166,13 @@ def load_data_week(date = datetime.now(), citiesNotShow = set()):
         colunas[i] = str(i+1) + " - " + colunas[i]
         
 
-    dicionario = []
+    dicionario = {}
     for local in np.sort(df.local.unique()):
         df_local = df[df.local == local]
         aux_df = pd.DataFrame(columns=colunas, index=["Transito"])
         for day in df.day_week.unique():
             aux_df[diasDaSemana[day] + ' - ' + day] = df_local[df.day_week == day].transito.mean()
-        dicionario.append((local, aux_df.T))
+        dicionario[local] = aux_df.T
 
 
     return dicionario
@@ -279,77 +279,16 @@ if st.button('Esta semana'):
 dateInit = (date3 - dt.timedelta(days=6)).strftime("%d/%m/%Y")
 st.subheader(date3.strftime(f"Em visualização {dateInit} - %d/%m/%Y"))
 
+row3_1, row3_2 = st.columns((2,6))
+
 barData = load_data_week(date3)
 
-row3_1, row3_2, row3_3, row3_4, row3_5 = st.columns((1,1,1,1,1))
-row4_1, row4_2, row4_3, row4_4, row4_5 = st.columns((1,1,1,1,1))
+tuppleLocals = tuple(barData.keys())
 
 with row3_1:
-    try:
-        st.subheader(barData[0][0], anchor=f"allWeek_{barData[0][0]}")
-        st.bar_chart(barData[0][1])
-    except:
-        pass
+    localChoosed = st.radio(
+     "Escolhe o local",
+     tuppleLocals)
 
 with row3_2:
-    try:
-        st.subheader(barData[1][0], anchor=f"allWeek_{barData[1][0]}")
-        st.bar_chart(barData[1][1])
-    except:
-        pass
-
-with row3_3:
-    try:
-        st.subheader(barData[2][0], anchor=f"allWeek_{barData[2][0]}")
-        st.bar_chart(barData[2][1])
-    except:
-        pass
-
-with row3_4:
-    try:
-        st.subheader(barData[3][0], anchor=f"allWeek_{barData[3][0]}")
-        st.bar_chart(barData[3][1])
-    except:
-        pass
-
-with row3_5:
-    try:
-        st.subheader(barData[4][0], anchor=f"allWeek_{barData[4][0]}")
-        st.bar_chart(barData[4][1])
-    except:
-        pass
-
-with row4_1:
-    try:
-        st.subheader(barData[5][0], anchor=f"allWeek_{barData[5][0]}")
-        st.bar_chart(barData[5][1])
-    except:
-        pass
-
-with row4_2:
-    try:
-        st.subheader(barData[6][0], anchor=f"allWeek_{barData[6][0]}")
-        st.bar_chart(barData[6][1])
-    except:
-        pass
-
-with row4_3:
-    try:
-        st.subheader(barData[7][0], anchor=f"allWeek_{barData[7][0]}")
-        st.bar_chart(barData[7][1])
-    except:
-        pass
-
-with row4_4:
-    try:
-        st.subheader(barData[8][0], anchor=f"allWeek_{barData[8][0]}")
-        st.bar_chart(barData[8][1])
-    except:
-        pass
-
-with row4_5:
-    try:
-        st.subheader(barData[9][0], anchor=f"allWeek_{barData[9][0]}")
-        st.bar_chart(barData[9][1])
-    except:
-        pass
+    st.bar_chart(barData[localChoosed])
